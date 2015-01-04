@@ -1,3 +1,9 @@
-## MoneyForwardから総資産をとってくるだけのスクリプト
-app.rb のようにすれば動く.
-予め auth.json にログイン情報を記述しておく必要がある.
+## MoneyForwardScraper
+
+### How to run
+1. Edit mail and password on `auth.json`.
+2. Run.
+
+```
+ruby app.rb
+```
