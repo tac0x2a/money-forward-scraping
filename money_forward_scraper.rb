@@ -26,7 +26,17 @@ class MoneyForwardScraper
     form = page.forms[0]
     form.field_with(:name => 'user[email]').value = @auth_json["mail"]
     form.field_with(:name => 'user[password]').value = @auth_json["password"]
-    form.click_button
+
+    # 2 step auth
+    logged_in_page = form.click_button
+    two_step_verify_form = logged_in_page.forms[1]
+
+    print("Please input verification code sent #{@auth_json["mail"]} :")
+    verification_code = gets.strip
+
+    two_step_verify_form.field_with(:name => "verification_code").value = verification_code
+    two_step_verify_form.click_button
+
   end
 
   def sign_out
