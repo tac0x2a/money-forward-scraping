@@ -9,16 +9,16 @@ class MoneyForwardScraper
   @@SIGN_IN_URL = "https://moneyforward.com/users/sign_in"
   @@SIGN_OUT_URL = "https://moneyforward.com/users/sign_out"
   @@DEFAULT_URL = "https://moneyforward.com/"
-  
+
   def initialize
     @agent = Mechanize.new
     # open local-file
-    begin    
+    begin
       @auth_json = JSON.parse(File.read("auth.json", :encoding => Encoding::UTF_8))
     rescue Errno::ENOENT
       puts "no such file 'auth.json'"
       exit 1
-    end      
+    end
   end
 
   def sign_in
@@ -32,7 +32,7 @@ class MoneyForwardScraper
   def sign_out
     @agent.get(@@SIGN_OUT_URL)
   end
-  
+
   def total_assets
     value = "null"
     @agent.get(@@DEFAULT_URL).search("section.total-assets div.heading-radius-box").find_all do |e|
