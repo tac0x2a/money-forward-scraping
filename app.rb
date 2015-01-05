@@ -17,16 +17,10 @@ rescue Errno::ENOENT
   exit 1
 end
 
+MoneyForwardScraper.open(mail, password) do |mfs|
+  # Show total assets
+  p mfs.total_assets
 
-# Sign in.
-mfs = MoneyForwardScraper.new(mail, password)
-mfs.sign_in
-
-# Show total assets
-p mfs.total_assets
-
-# Create cache flow
-p mfs.create_cacheflow(amount: 1000, content: "Sample Amount")
-
-# Sign out.
-mfs.sign_out
+  # Create cache flow
+  p mfs.create_cacheflow(amount: 1000, content: "Sample Amount")
+end

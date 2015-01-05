@@ -4,11 +4,19 @@
 require 'mechanize'
 
 class MoneyForwardScraper
-
   @@SIGN_IN_URL = "https://moneyforward.com/users/sign_in"
   @@SIGN_OUT_URL = "https://moneyforward.com/users/sign_out"
   @@DEFAULT_URL = "https://moneyforward.com/"
   @@CACHE_FLOW_URL = "https://moneyforward.com/cf"
+
+  def MoneyForwardScraper.open(mail, password, &block)
+    raise ArgumentError, "block not given" unless block_given?
+
+    mfs = MoneyForwardScraper.new(mail, password)
+    mfs.sign_in
+    yield(mfs)
+    mfs.sign_out
+  end
 
   def initialize(mail, password)
     @agent = Mechanize.new
@@ -46,5 +54,4 @@ class MoneyForwardScraper
     end.submit
     {updated_at: updated_at, amount: amount, content: content}
   end
-
 end
