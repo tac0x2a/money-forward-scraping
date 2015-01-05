@@ -22,12 +22,7 @@ MoneyForwardScraper.open(mail, password) do |mfs|
   p mfs.total_assets
   # => "5,712,315"
 
-  # Get Category id
-  p categories = mfs.get_categories()
-  # => {1=>["収入", {1=>"給与", 2=>"一時所得", 3=>"事業・副業", 4=>"年金", 89=>"配当所得", ...
-
   # Create cache flow
-  p mfs.create_cacheflow(amount: 1000, content: "Sample Amount")
-  # => {:updated_at=>"2015/01/05", :amount=>1000, :content=>"Sample Amount"}
-
+  p mfs.create_cacheflow(amount: 1000, content: "Sample Amount", category_names: ["食費","外食"])
+  # => {:updated_at=>"2015/01/05", :amount=>1000, :content=>"Sample Amount", :category_id=>[11, 42]}
 end

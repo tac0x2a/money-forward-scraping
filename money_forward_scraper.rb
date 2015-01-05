@@ -46,14 +46,31 @@ class MoneyForwardScraper
     value
   end
 
-  def create_cacheflow(updated_at: Time.now.strftime("%Y/%m/%d"), amount: '0', content: '')
+  def create_cacheflow(
+             updated_at:     Time.now.strftime("%Y/%m/%d"),
+             amount:         0,
+             category_names: nil,
+             content:        '')
+
+    category_id = if category_names
+                    c = get_categories
+                    c.get_id_by_names(*category_names)
+                  else
+                    nil
+                  end
+
     page = @agent.get(@@CACHE_FLOW_URL)
     page.form_with(:action =>  '/cf/create') do |form|
       form.field_with(:name => 'user_asset_act[updated_at]').value = updated_at
       form.field_with(:name => 'user_asset_act[amount]').value = amount.to_s
       form.field_with(:name => 'user_asset_act[content]').value = content
+      if category_id
+        form.field_with(:name => 'user_asset_act[large_category_id]').value  = category_id[0]
+        form.field_with(:name => 'user_asset_act[middle_category_id]').value = category_id[1]
+      end
     end.submit
-    {updated_at: updated_at, amount: amount, content: content}
+
+    {updated_at: updated_at, amount: amount, content: content, category_id: category_id}
   end
 
   def get_categories()
