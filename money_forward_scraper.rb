@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 require 'mechanize'
-require 'json'
 
 class MoneyForwardScraper
 
@@ -11,22 +10,16 @@ class MoneyForwardScraper
   @@DEFAULT_URL = "https://moneyforward.com/"
   @@CACHE_FLOW_URL = "https://moneyforward.com/cf"
 
-  def initialize
+  def initialize(mail, password)
     @agent = Mechanize.new
-    # open local-file
-    begin
-      @auth_json = JSON.parse(File.read("auth.json", :encoding => Encoding::UTF_8))
-    rescue Errno::ENOENT
-      puts "no such file 'auth.json'"
-      exit 1
-    end
+    @mail, @password = mail, password
   end
 
   def sign_in
     page = @agent.get(@@SIGN_IN_URL)
     form = page.forms[0]
-    form.field_with(:name => 'user[email]').value = @auth_json["mail"]
-    form.field_with(:name => 'user[password]').value = @auth_json["password"]
+    form.field_with(:name => 'user[email]').value    = @mail
+    form.field_with(:name => 'user[password]').value = @password
     form.click_button
   end
 

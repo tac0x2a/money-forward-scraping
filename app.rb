@@ -1,9 +1,25 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
+
+require 'json'
+
 require "./money_forward_scraper"
 
+AuthJsonFile = "auth.json"
+mail = password = ""
+
+begin
+  auth_json = JSON.parse(File.read(AuthJsonFile, :encoding => Encoding::UTF_8))
+  mail     = auth_json["mail"]
+  password = auth_json["password"]
+rescue Errno::ENOENT
+  puts "no such file 'auth.json'"
+  exit 1
+end
+
+
 # Sign in.
-mfs = MoneyForwardScraper.new
+mfs = MoneyForwardScraper.new(mail, password)
 mfs.sign_in
 
 # Show total assets
