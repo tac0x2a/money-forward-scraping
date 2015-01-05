@@ -25,4 +25,12 @@ MoneyForwardScraper.open(mail, password) do |mfs|
   # Create cache flow
   p mfs.create_cacheflow(amount: 1000, content: "Sample Amount", category_names: ["食費","外食"])
   # => {:updated_at=>"2015/01/05", :amount=>1000, :content=>"Sample Amount", :category_id=>[11, 42]}
+
+  # Get category id
+  p mfs.get_categories().get_id_by_names("食費","外食")
+  # => [11, 42]
+
+  # Create new category
+  p mfs.create_middle_category_by_name("食費", "社員食堂")
+  # => [11, 1094831]
 end

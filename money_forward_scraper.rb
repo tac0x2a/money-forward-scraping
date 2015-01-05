@@ -96,12 +96,18 @@ class MoneyForwardScraper
     end
 
     # define util method
-    def categories.get_id_by_names(large_name, middle_name)
-      large = self.find{|l_id, lc| lc[0] == large_name}
+    def categories.get_large_category_id_by_name(l_name)
+      large = self.find{|l_id, lc| lc[0] == l_name}
       return nil unless large
       l_id, l_name, middle = large.flatten
 
-      middle = middle.find{|m_id, m_name| m_name == middle_name}
+      return l_id
+    end
+
+    def categories.get_id_by_names(large_name, middle_name)
+      l_id = get_large_category_id_by_name(large_name)
+
+      middle = self[l_id][1].find{|m_id, m_name| m_name == middle_name}
       return nil unless middle
       m_id, m_name = middle
 
@@ -110,4 +116,22 @@ class MoneyForwardScraper
 
     return categories
   end # of get_categories
+
+  def create_middle_category_by_name(l_category_name, m_category_name)
+    categories = get_categories()
+    l_id = categories.get_large_category_id_by_name(l_category_name)
+    raise ArgumentError, "Undefined Large category name '#{l_category_name}'" if l_id == nil
+
+    page = @agent.get(@@CATEGORY_URL)
+    category_form = page.forms_with(:action => '/middle_categories/create').find do |form|
+      form.field_with(:name => 'middle_category[large_category_id]', :value => l_id.to_s)
+    end
+    return nil if category_form == nil
+
+    category_form.field_with(:name => 'middle_category[name]').value = m_category_name
+    category_form.submit
+
+    # return created id
+    return get_categories().get_id_by_names(l_category_name, m_category_name)
+  end
 end
