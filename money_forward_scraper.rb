@@ -52,12 +52,12 @@ class MoneyForwardScraper
              category_names: nil,
              content:        '')
 
-    category_id = if category_names
-                    c = get_categories
-                    c.get_id_by_names(*category_names)
-                  else
-                    nil
-                  end
+    category_id = nil
+
+    if category_names
+      category_id = get_categories().get_id_by_names(*category_names)
+      category_id ||= create_middle_category_by_name(*category_names)
+    end
 
     page = @agent.get(@@CACHE_FLOW_URL)
     page.form_with(:action =>  '/cf/create') do |form|
