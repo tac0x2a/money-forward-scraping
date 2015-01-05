@@ -8,6 +8,7 @@ class MoneyForwardScraper
   @@SIGN_OUT_URL = "https://moneyforward.com/users/sign_out"
   @@DEFAULT_URL = "https://moneyforward.com/"
   @@CACHE_FLOW_URL = "https://moneyforward.com/cf"
+  @@CATEGORY_URL = "https://moneyforward.com/profile/rule"
 
   def MoneyForwardScraper.open(mail, password, &block)
     raise ArgumentError, "block not given" unless block_given?
@@ -54,4 +55,42 @@ class MoneyForwardScraper
     end.submit
     {updated_at: updated_at, amount: amount, content: content}
   end
+
+  def get_categories()
+    page = @agent.get(@@CATEGORY_URL)
+
+    categories_links = page.links.select do |link|
+      link.node['class'] =~ /[ml]_c_name/
+    end
+
+    categories = {}
+    category = nil # [id, name, middle_categories]
+
+    categories_links.each do |link|
+      node = link.node
+
+      case node['class']
+      when /l_c_name/
+        category = [node.text, {}]
+        categories[node['id'].to_i] = category
+      when /m_c_name/
+        category[1][node['id'].to_i] = node.text
+      end
+    end
+
+    # define util method
+    def categories.get_id_by_names(large_name, middle_name)
+      large = self.find{|l_id, lc| lc[0] == large_name}
+      return nil unless large
+      l_id, l_name, middle = large.flatten
+
+      middle = middle.find{|m_id, m_name| m_name == middle_name}
+      return nil unless middle
+      m_id, m_name = middle
+
+      return [l_id, m_id]
+    end
+
+    return categories
+  end # of get_categories
 end
